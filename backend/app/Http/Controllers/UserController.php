@@ -32,10 +32,10 @@ class UserController {
                 'password' => Hash::make($req['password'])
             ]);
             return response()
-                ->json($user, 201)
+                ->json($user, Response::HTTP_CREATED)
                 ->cookie(
                     CookiesHelper::createUserCookie(
-                        SessionsHelper::createSession($user)
+                        SessionsHelper::createSession($user, $req->ip(), $req->userAgent())
                     )
                 );
         } catch(UniqueConstraintViolationException $error) {
@@ -60,7 +60,7 @@ class UserController {
         ValidationsHelper::login($req);
         $user = User::where('email', $req['email'])->first();
         if ( empty($user) )
-            return response()->json(['error' => 'User NOT found!'], Response::HTTP_NOT_EXTENDED);
+            return response()->json(['error' => 'User NOT found!'], Response::HTTP_NOT_FOUND);
         if ( 
             !Hash::check($req['password'],$user->password)
         ) return response()->json(['error' => "Unauthorized!"], Response::HTTP_UNAUTHORIZED);
@@ -68,7 +68,7 @@ class UserController {
             ->json($user)
             ->cookie(
                 CookiesHelper::createUserCookie(
-                    SessionsHelper::createSession($user)
+                    SessionsHelper::createSession($user, $req->ip(), $req->userAgent())
                 )
             );
     }
@@ -84,6 +84,23 @@ class UserController {
         return response()
             ->json(['message' => "Loged out."])
             ->cookie(CookiesHelper::deleteCookie());
+    }
+
+    public function update(int $id, Request $req) {
+        if ($id < 0 ) 
+            return response()->json(['error' => 'Invalid id!'], Response::HTTP_BAD_REQUEST);
+        if ( $id != $req['user']['id'] && !$req['user']['is_admin'])
+            return response()->json(['error' => 'Unauthorized!'], Response::HTTP_UNAUTHORIZED);
+
+        ValidationsHelper::update($req);
+        $user = User::where('id', $id)->first();
+        if (empty($user)) response()->json(['error' => 'User NOT found!'], Response::HTTP_NOT_FOUND);
+        
+        $user->name = $req->input('name', $user->name);
+        $user->email = $req->input('email', $user->email);
+        $user->password = $req->input('password', $user->password);
+        $user->save();
+        return response()->json($user);
     }
 
     /**

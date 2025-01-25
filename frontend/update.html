@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/admin.css">
+    <title>Update User</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .container input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+        .container button {
+            padding: 8px 16px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Update User</h2>
+        <input type="text" id="editName" placeholder="Name">
+        <input type="email" id="editEmail" placeholder="Email">
+        <input type="password" id="editPassword" placeholder="New Password (leave blank to keep current)">
+        <button onclick="updateUser()">Save</button>
+        <button onclick="window.location.href='admin.html'">Cancel</button>
+    </div>
+
+    <script src="./js/update.js"></script>
+</body>
+</html>
