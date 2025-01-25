@@ -1,3 +1,33 @@
+async function uploadImage() {
+    const imageFile = document.getElementById('image').files[0];
+
+    if (!imageFile) {
+        alert('Please select an image.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    try {
+        const response = await fetch(`http://localhost:8000/api/upload`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to upload image.');
+        }
+
+        const result = await response.json();
+        alert('Image uploaded successfully!');
+        location.reload();
+    } catch (error) {
+        alert('Failed to upload image. Please try again.');
+    }
+}
+
 
 async function fetchUsers() {
     try {
@@ -25,7 +55,6 @@ async function fetchUsers() {
     }
 }
 
-
 function injectUsersIntoTable(users) {
     const tbody = document.getElementById('users-table-body');
     
@@ -40,7 +69,8 @@ function injectUsersIntoTable(users) {
             <td>${user.email}</td>
             <td>${user.created_at}</td>
             <td>${user.updated_at}</td>
-            <td>
+            <td class="butt">
+                <a href="update.html?id=${user.id}" class="edit-btn">Edit</a>
                 <button class="delete-btn" onclick="deleteUser(${user.id}, '${user.name}')">Delete</button>
             </td>
         `;
@@ -48,7 +78,6 @@ function injectUsersIntoTable(users) {
         tbody.appendChild(row);
     });
 }
-
 
 async function deleteUser(id, userName) {
     if (confirm(`Are you sure you want to delete ${userName} with id ${id}?`)) {
@@ -69,6 +98,5 @@ async function deleteUser(id, userName) {
         location.reload();
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', fetchUsers);
